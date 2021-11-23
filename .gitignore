@@ -1,0 +1,7 @@
+/transfer/vendor
+/transfer/.idea
+/transfer/Homestead.json
+/transfer/Homestead.yaml
+/transfer/.env
+/transfer/.phpunit.result.cache
+/data

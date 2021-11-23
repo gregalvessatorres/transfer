@@ -1,0 +1,27 @@
+version: "3"
+services:
+  db-transfer:
+    image: mysql:5.7
+    container_name: db-transfer
+    tty: true
+    ports:
+      - 3307:3306
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db-transfer
+
+  php-transfer:
+    container_name: php-transfer
+    tty: true
+    build:
+      context: ./build/php/
+    ports:
+        - '8080:80'
+    volumes:
+      - ./transfer:/var/www/html
+      - ./build/php/default.conf:/etc/apache2/sites-enabled/000-default.conf
+    working_dir: /var/www/html/app/public
+    depends_on:
+      - db-transfer
