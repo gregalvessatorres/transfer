@@ -22,6 +22,5 @@ services:
     volumes:
       - ./transfer:/var/www/html
       - ./build/php/default.conf:/etc/apache2/sites-enabled/000-default.conf
-    working_dir: /var/www/html/app/public
     depends_on:
       - db-transfer

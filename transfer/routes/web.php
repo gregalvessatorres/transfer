@@ -16,3 +16,17 @@
 $router->get('/', function () use ($router) {
     return 'you know, purely for academic purposes';
 });
+
+$router->group(['prefix' => 'transfer'], function () use ($router){
+    $router->post('/', 'TransferController@post');
+});
+
+$router->group(['prefix' => 'users'], function () use ($router){
+    $router->get('/', 'UserController@index');
+});
+
+$router->group(['prefix' => 'wallets'], function () use ($router){
+    $router->get('/', 'WalletController@index');
+});
+
+$router->get('/test', 'TransferController@users');
