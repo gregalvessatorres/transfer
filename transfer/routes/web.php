@@ -17,16 +17,23 @@ $router->get('/', function () use ($router) {
     return 'you know, purely for academic purposes';
 });
 
-$router->group(['prefix' => 'transfer'], function () use ($router){
-    $router->post('/', 'TransferController@post');
+$router->group(['prefix' => 'transactions'], function () use ($router) {
+    $router->post('', 'TransactionController@store');
+    $router->get('', 'TransactionController@index');
+    $router->get('{id}', 'TransactionController@show');
+    $router->delete('{id}', 'TransactionController@destroy');
 });
 
-$router->group(['prefix' => 'users'], function () use ($router){
-    $router->get('/', 'UserController@index');
+$router->group(['prefix' => 'users'], function () use ($router) {
+    $router->post('', 'UserController@store');
+    $router->get('', ['as' => 'user_get', 'uses' => 'UserController@index']);
+    $router->get('{id}', ['as' => 'user_get_id', 'uses' => 'UserController@show']);
+    $router->delete('{id}', 'UserController@destroy');
 });
 
-$router->group(['prefix' => 'wallets'], function () use ($router){
-    $router->get('/', 'WalletController@index');
+$router->group(['prefix' => 'wallets'], function () use ($router) {
+    $router->post('', 'WalletController@store');
+    $router->get('', ['as' => 'wallet_get', 'uses' => 'WalletController@index']);
+    $router->get('{id}', ['as' => 'wallet_get_id', 'uses' => 'WalletController@show']);
+    $router->delete('{id}', 'WalletController@destroy');
 });
-
-$router->get('/test', 'TransferController@users');

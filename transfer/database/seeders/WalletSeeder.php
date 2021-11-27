@@ -20,7 +20,7 @@ class WalletSeeder extends Seeder
         $users->each(function ($user) {
             Wallet::create([
                                'user'     => $user->id,
-                               'ballance' => rand(1, 99)
+                               'balance' => rand(1, 999)
                            ]);
         });
     }
