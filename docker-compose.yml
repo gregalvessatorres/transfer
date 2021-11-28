@@ -1,7 +1,7 @@
 version: "3"
 services:
   db-transfer:
-    image: mysql:5.7
+    image: mysql
     container_name: db-transfer
     tty: true
     ports:
