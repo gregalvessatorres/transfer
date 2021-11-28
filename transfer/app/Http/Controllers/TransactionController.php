@@ -24,7 +24,7 @@ class TransactionController extends BaseController
     public function store(Request $request)
     {
         $this->validate($request, [
-            'value' => 'required|min:1',
+            'value' => 'required|numeric|min:1',
             'payer' => 'required|different:payee|exists:users,id',
             'payee' => 'required|different:payer|exists:users,id',
         ]);
@@ -37,5 +37,19 @@ class TransactionController extends BaseController
             return response()->json($this->simpleMessage($e->getMessage()), $e->getCode());
         }
         return response()->json($transaction, Response::HTTP_OK);
+    }
+
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+        try {
+            $this->service->destroy($id);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return response()->json($this->simpleMessage($e->getMessage()), $e->getCode());
+        }
+        return response()->json($this->successMessageCheckIndex(), Response::HTTP_OK);
     }
 }

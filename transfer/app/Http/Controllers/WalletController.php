@@ -27,13 +27,13 @@ class WalletController extends BaseController
 
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'user'    => 'required|exists:users,id',
+            'balance' => 'sometimes|numeric|min:0'
+        ]);
+
         DB::beginTransaction();
         try {
-            $this->validate($request, [
-                'user'    => 'required|exists:users,id',
-                'balance' => 'sometimes|numeric|min:0'
-            ]);
-
             $wallet = $this->service->create($request->all());
 
             DB::commit();

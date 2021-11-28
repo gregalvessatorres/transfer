@@ -27,22 +27,22 @@ class UserController extends BaseController
 
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'name'      => 'required',
+            'email'     => 'required|email|unique:users,email',
+            'cpf_cnpj'  => 'required|unique:users,cpf_cnpj',
+            'user_type' => 'required|in:' . implode(',', config('const.user_type')),
+        ]);
+
         DB::beginTransaction();
         try {
-            $this->validate($request, [
-                'name'      => 'required',
-                'email'     => 'required|email',
-                'cpf_cnpj'  => 'required',
-                'user_type' => 'required|in:' . implode(',', config('const.user_type')),
-            ]);
-
             $user = $this->service->createUser($request->all());
 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
 
-            return response()->json($this->simpleMessage($e->getMessage()), $e->getCode());
+            return response()->json($this->simpleMessage($e->getMessage()), Response::HTTP_BAD_REQUEST);
         }
 
         return response()->json($user, Response::HTTP_OK);
@@ -57,7 +57,7 @@ class UserController extends BaseController
         } catch (\Exception $e) {
             DB::rollback();
 
-            return response()->json($this->simpleMessage($e->getMessage()), $e->getCode());
+            return response()->json($this->simpleMessage($e->getMessage()), Response::HTTP_BAD_REQUEST);
         }
         return response()->json($this->successMessageCheckIndex(), Response::HTTP_OK);
     }

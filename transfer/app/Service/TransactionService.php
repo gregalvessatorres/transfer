@@ -12,7 +12,7 @@ class TransactionService
 {
     public function performTransaction(array $data): Transaction
     {
-        [$payerWallet, $payeeWallet] = $this->findWallets($data);
+        [$payerWallet, $payeeWallet] = $this->findWallets($data['payer'], $data['payee']);
         [$payer, $payee] = $this->findUsers($payerWallet, $payeeWallet);
 
         $this->executeBasicValidations($payerWallet, $data['value']);
@@ -26,13 +26,13 @@ class TransactionService
         return $transaction;
     }
 
-    private function findWallets(array $data): array
+    private function findWallets(int $payer, int $payee): array
     {
-        $payerWallet = Wallet::where(['user' => $data['payer']])->first();
-        $payeeWallet = Wallet::where(['user' => $data['payee']])->first();
+        $payerWallet = Wallet::where(['user' => $payer])->first();
+        $payeeWallet = Wallet::where(['user' => $payee])->first();
 
         if (is_null($payerWallet) || is_null($payeeWallet)) {
-            throw new \Exception('One or both users have no wallet', Response::HTTP_BAD_REQUEST);
+            throw new \Exception('One or both users have no wallet with funds', Response::HTTP_BAD_REQUEST);
         }
 
         return [$payerWallet, $payeeWallet];
@@ -61,7 +61,7 @@ class TransactionService
         $mockUrl      = 'https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6';
         $response     = $guzzleGlient->request('GET', $mockUrl);
         $data         = json_decode($response->getBody());
-        if ($data->message != config('const.authorization_message')) {
+        if (!is_null($data->message) && $data->message != config('const.authorization_message')) {
             throw new \Exception('Transaction not authorized', Response::HTTP_UNAUTHORIZED);
         }
     }
@@ -107,5 +107,25 @@ class TransactionService
     private function putUserNotificationInQueue(array $transactionData): void
     {
         Queue::push(new TransactionNotificationJob($transactionData));
+    }
+
+    public function destroy(int $id): void
+    {
+        $transaction = Transaction::find($id);
+
+        if (is_null($transaction)) {
+            throw new \Exception('Tansaction not found', Response::HTTP_NOT_FOUND);
+        }
+
+        [$senderWallet, $receiverWallet] = $this->findWallets($transaction->payer, $transaction->payee);
+        [$sender, $receiver] = $this->findUsers($senderWallet, $receiverWallet);
+
+        $this->validateFundsForTransfer($receiverWallet, $transaction->value);
+
+        $this->executeTransferOfFundsOnTheWallets($receiverWallet, $transaction->value, $senderWallet);
+
+        $this->putUserNotificationInQueue(array_merge($transaction->toArray(), $receiver->toarray(), $sender->toarray()));
+
+        $transaction->delete();
     }
 }

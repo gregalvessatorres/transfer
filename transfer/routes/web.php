@@ -19,7 +19,7 @@ $router->get('/', function () use ($router) {
 
 $router->group(['prefix' => 'transactions'], function () use ($router) {
     $router->post('', 'TransactionController@store');
-    $router->get('', 'TransactionController@index');
+    $router->get('', ['as' => 'transaction_get', 'uses' => 'TransactionController@index']);
     $router->get('{id}', 'TransactionController@show');
     $router->delete('{id}', 'TransactionController@destroy');
 });

@@ -18,9 +18,6 @@ class CreateTransactionTable extends Migration
             $table->decimal('value');
             $table->integer('payer')->unsigned();
             $table->integer('payee')->unsigned();
-
-            $table->foreign('payer')->references('id')->on('users');
-            $table->foreign('payee')->references('id')->on('users');
             $table->timestamps();
         });
     }
@@ -32,10 +29,6 @@ class CreateTransactionTable extends Migration
      */
     public function down()
     {
-        Schema::table('transactions', function (Blueprint $table){
-            $table->dropForeign('payer');
-            $table->dropForeign('payee');
-        });
         Schema::dropIfExists('transactions');
     }
 }
