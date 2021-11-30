@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use App\Models\Wallet;
+use App\Service\WalletService;
 use Illuminate\Http\Response;
 
 class WalletServiceTest extends TestCase
@@ -10,7 +10,7 @@ class WalletServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->service = Mockery::mock(\App\Service\WalletService::class)->makePartial();
+        $this->service = Mockery::mock(WalletService::class)->makePartial();
 
         parent::setUp();
     }

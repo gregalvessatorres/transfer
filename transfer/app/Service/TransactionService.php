@@ -82,11 +82,6 @@ class TransactionService
         }
     }
 
-    /**
-     * @param $payerWallet
-     * @param $value
-     * @param $payeeWallet
-     */
     private function executeTransferOfFundsOnTheWallets(Wallet $payerWallet, float $value, Wallet $payeeWallet): void
     {
         $payerWallet->balance = $payerWallet->balance - $value;
